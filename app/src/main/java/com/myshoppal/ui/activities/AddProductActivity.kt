@@ -1,6 +1,7 @@
 package com.myshoppal.ui.activities
 
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
@@ -11,6 +12,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.myshoppal.R
 import com.myshoppal.firestore.FirestoreClass
+import com.myshoppal.models.Product
 import com.myshoppal.utils.Constants
 import com.myshoppal.utils.GlideLoader
 import kotlinx.android.synthetic.main.activity_add_product.*
@@ -19,6 +21,7 @@ import java.io.IOException
 class AddProductActivity : BaseActivity(), View.OnClickListener {
 
     private var mSelectedImageFileURI:Uri? = null
+    private var mProductImageURL:String = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -136,7 +139,31 @@ class AddProductActivity : BaseActivity(), View.OnClickListener {
     }
 
     fun imageUploadSuccess(imagerURL:String){
+//        hideProgressBar()
+//        showErrorSnackBar("product image is uploaded successfully. Image url: $imagerURL",false)
+        mProductImageURL = imagerURL
+        uploadProductDetails()
+    }
+
+    fun productUploadSuccess(){
         hideProgressBar()
-        showErrorSnackBar("product image is uploaded successfully. Image url: $imagerURL",false)
+        Toast.makeText(this,getString(R.string.product_uploaded_success_message),Toast.LENGTH_SHORT).show()
+        finish()
+    }
+
+    private fun uploadProductDetails(){
+        val username = this.getSharedPreferences(Constants.MYSHOPPAL_PREFERENCES, Context.MODE_PRIVATE)
+            .getString(Constants.LOGGED_IN_USERNAME,"")!!
+
+        val product = Product(
+            FirestoreClass().getCurrentUserId(),
+            username,
+            et_product_title.text.toString().trim{it<=' '},
+            et_product_price.text.toString().trim{it<=' '},
+            et_product_description.text.toString().trim(){it<=' '},
+            et_product_quantity.text.toString().trim{it<=' '},
+            mProductImageURL
+        )
+        FirestoreClass().uploadProductDetails(this,product)
     }
 }
