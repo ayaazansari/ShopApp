@@ -2,14 +2,21 @@ package com.myshoppal.ui.fragments
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.*
+import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.myshoppal.R
 import com.myshoppal.databinding.FragmentDashboardBinding
+import com.myshoppal.firestore.FirestoreClass
+import com.myshoppal.models.Product
 import com.myshoppal.ui.activities.SettingsActivity
+import com.myshoppal.ui.adapters.DashboardItemsListAdapter
+import kotlinx.android.synthetic.main.fragment_dashboard.*
 
-class DashboardFragment : Fragment() {
+class DashboardFragment : BaseFragment() {
 
     private var _binding: FragmentDashboardBinding? = null
 
@@ -31,9 +38,12 @@ class DashboardFragment : Fragment() {
         _binding = FragmentDashboardBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
-        val textView: TextView = binding.textDashboard
-            textView.text = "This is dashboard fragment"
         return root
+    }
+
+    override fun onResume() {
+        super.onResume()
+        getDashBoardItemsList()
     }
 
     override fun onDestroyView() {
@@ -55,5 +65,28 @@ class DashboardFragment : Fragment() {
             }
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    fun successDashboardItemsList(dashboardItemsList:ArrayList<Product>){
+        hideProgressDialog()
+        if(dashboardItemsList.size>0){
+            rv_dashboard_items.visibility = View.VISIBLE
+            tv_no_dashboard_items_found.visibility = View.GONE
+
+            rv_dashboard_items.layoutManager = LinearLayoutManager(requireActivity())
+            rv_dashboard_items.setHasFixedSize(true)
+
+            val adapter = DashboardItemsListAdapter(requireActivity(),dashboardItemsList)
+            rv_dashboard_items.adapter = adapter
+        }
+        else{
+            rv_dashboard_items.visibility = View.GONE
+            tv_no_dashboard_items_found.visibility = View.VISIBLE
+        }
+    }
+
+    private fun getDashBoardItemsList(){
+        showProgressDialog(getString(R.string.please_wait))
+        FirestoreClass().getDashBoardItemsList(this@DashboardFragment)
     }
 }

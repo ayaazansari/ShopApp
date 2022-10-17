@@ -7,10 +7,11 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.myshoppal.R
 import com.myshoppal.models.Product
+import com.myshoppal.ui.fragments.ProductsFragment
 import com.myshoppal.utils.GlideLoader
 import kotlinx.android.synthetic.main.item_list_layout.view.*
 
-class MyProductsListAdapter(val context: Context,val list:ArrayList<Product> ) :
+class MyProductsListAdapter(val context: Context,val list:ArrayList<Product>,private val fragment:ProductsFragment) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
@@ -30,6 +31,9 @@ class MyProductsListAdapter(val context: Context,val list:ArrayList<Product> ) :
             GlideLoader(context).loadProductPicture(model.image,holder.itemView.iv_item_image)
             holder.itemView.tv_item_name.text = model.title
             holder.itemView.tv_item_price.text = "$${model.price}"
+            holder.itemView.ib_delete_product.setOnClickListener{
+                fragment.deleteProduct(model.product_id)
+            }
         }
     }
 

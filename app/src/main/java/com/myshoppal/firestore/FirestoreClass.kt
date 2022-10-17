@@ -14,6 +14,7 @@ import com.google.firebase.storage.StorageReference
 import com.myshoppal.models.Product
 import com.myshoppal.models.User
 import com.myshoppal.ui.activities.*
+import com.myshoppal.ui.fragments.DashboardFragment
 import com.myshoppal.ui.fragments.ProductsFragment
 import com.myshoppal.utils.Constants
 
@@ -199,6 +200,45 @@ class FirestoreClass {
                         fragment.successProductListFromFireStore(productList)
                     }
                 }
+            }
+    }
+
+    fun deleteProduct(fragment: ProductsFragment,productId:String){
+        mFireStore.collection(Constants.PRODUCT)
+            .document(productId)
+            .delete()
+            .addOnSuccessListener {
+                fragment.productDeleteSuccess()
+            }
+            .addOnFailureListener {e->
+                fragment.hideProgressDialog()
+                Log.e(
+                    fragment.javaClass.simpleName,
+                    "Error while getting dashboard item list",
+                    e
+                )
+            }
+    }
+
+    fun getDashBoardItemsList(fragment: DashboardFragment){
+        mFireStore.collection(Constants.PRODUCT)
+            .get()
+            .addOnSuccessListener { document->
+                val productList: ArrayList<Product> = ArrayList()
+                for(i in document.documents){
+                    val product = i.toObject(Product::class.java)!!
+                    product.product_id = i.id
+                    productList.add(product)
+                }
+                fragment.successDashboardItemsList(productList)
+            }
+            .addOnFailureListener { e ->
+                fragment.hideProgressDialog()
+                Log.e(
+                    fragment.javaClass.simpleName,
+                    "Error while getting dashboard item list",
+                    e
+                )
             }
     }
 

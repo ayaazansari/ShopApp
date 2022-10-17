@@ -6,6 +6,8 @@ import android.util.Log
 import android.view.*
 import android.widget.LinearLayout
 import android.widget.TextView
+import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.myshoppal.ui.activities.AddProductActivity
@@ -27,6 +29,44 @@ class ProductsFragment : BaseFragment() {
         setHasOptionsMenu(true)
     }
 
+    fun deleteProduct(productID:String){
+        showAlertDialogToDeleteProduct(productID)
+    }
+
+    private fun showAlertDialogToDeleteProduct(productID: String) {
+
+        val builder = AlertDialog.Builder(requireActivity())
+        //set title for alert dialog
+        builder.setTitle(resources.getString(R.string.delete_dialog_title))
+        //set message for alert dialog
+        builder.setMessage(resources.getString(R.string.delete_dialog_message))
+        builder.setIcon(android.R.drawable.ic_dialog_alert)
+
+        //performing positive action
+        builder.setPositiveButton(resources.getString(R.string.yes)) { dialogInterface, _ ->
+            showProgressDialog(getString(R.string.please_wait))
+            FirestoreClass().deleteProduct(this,productID)
+            dialogInterface.dismiss()
+        }
+
+        //performing negative action
+        builder.setNegativeButton(resources.getString(R.string.no)) { dialogInterface, _ ->
+
+            dialogInterface.dismiss()
+        }
+        // Create the AlertDialog
+        val alertDialog: AlertDialog = builder.create()
+        // Set other dialog properties
+        alertDialog.setCancelable(false)
+        alertDialog.show()
+    }
+
+    fun productDeleteSuccess(){
+        hideProgressDialog()
+        Toast.makeText(requireActivity(),getString(R.string.product_delete_success_message),Toast.LENGTH_SHORT).show()
+        getProductListFromFireStore()
+    }
+
     fun successProductListFromFireStore(productList:ArrayList<Product>){
         hideProgressDialog()
         if(productList.size>0){
@@ -35,7 +75,7 @@ class ProductsFragment : BaseFragment() {
 
             rv_my_product_items.layoutManager = LinearLayoutManager(activity)
             rv_my_product_items.setHasFixedSize(true)
-            val adapterProducts = MyProductsListAdapter(requireActivity(),productList)
+            val adapterProducts = MyProductsListAdapter(requireActivity(),productList,this)
             rv_my_product_items.adapter = adapterProducts
         }
     }
