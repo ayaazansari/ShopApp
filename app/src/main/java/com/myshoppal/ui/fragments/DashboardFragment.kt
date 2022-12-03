@@ -2,30 +2,23 @@ package com.myshoppal.ui.fragments
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.*
-import android.widget.LinearLayout
-import android.widget.TextView
-import androidx.fragment.app.Fragment
-import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.GridLayoutManager
 import com.myshoppal.R
-import com.myshoppal.databinding.FragmentDashboardBinding
 import com.myshoppal.firestore.FirestoreClass
 import com.myshoppal.models.Product
+import com.myshoppal.ui.activities.CartListActivity
+import com.myshoppal.ui.activities.ProductDetailsActivity
 import com.myshoppal.ui.activities.SettingsActivity
 import com.myshoppal.ui.adapters.DashboardItemsListAdapter
+import com.myshoppal.utils.Constants
 import kotlinx.android.synthetic.main.fragment_dashboard.*
 
 class DashboardFragment : BaseFragment() {
 
-    private var _binding: FragmentDashboardBinding? = null
-
-    // This property is only valid between onCreateView and
-    // onDestroyView.
-    private val binding get() = _binding!!
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        // If we want to use the option menu in fragment we need to add it.
         setHasOptionsMenu(true)
     }
 
@@ -33,60 +26,88 @@ class DashboardFragment : BaseFragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View {
+    ): View? {
 
-        _binding = FragmentDashboardBinding.inflate(inflater, container, false)
-        val root: View = binding.root
+        val root = inflater.inflate(R.layout.fragment_dashboard, container, false)
 
         return root
     }
 
-    override fun onResume() {
-        super.onResume()
-        getDashBoardItemsList()
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
-    }
-
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        inflater.inflate(R.menu.dashboard_menu,menu)
+        inflater.inflate(R.menu.dashboard_menu, menu)
         super.onCreateOptionsMenu(menu, inflater)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         val id = item.itemId
-        when(id){
-            R.id.action_settings ->{
+
+        when (id) {
+
+            R.id.action_settings -> {
+
                 startActivity(Intent(activity, SettingsActivity::class.java))
+                return true
+            }
+
+            R.id.action_cart -> {
+                startActivity(Intent(activity, CartListActivity::class.java))
                 return true
             }
         }
         return super.onOptionsItemSelected(item)
     }
 
-    fun successDashboardItemsList(dashboardItemsList:ArrayList<Product>){
+    override fun onResume() {
+        super.onResume()
+
+        getDashboardItemsList()
+    }
+
+    /**
+     * A function to get the dashboard items list from cloud firestore.
+     */
+    private fun getDashboardItemsList() {
+        // Show the progress dialog.
+        showProgressDialog(resources.getString(R.string.please_wait))
+
+        FirestoreClass().getDashboardItemsList(this@DashboardFragment)
+    }
+
+    /**
+     * A function to get the success result of the dashboard items from cloud firestore.
+     *
+     * @param dashboardItemsList
+     */
+    fun successDashboardItemsList(dashboardItemsList: ArrayList<Product>) {
+
+        // Hide the progress dialog.
         hideProgressDialog()
-        if(dashboardItemsList.size>0){
+
+        if (dashboardItemsList.size > 0) {
+
             rv_dashboard_items.visibility = View.VISIBLE
             tv_no_dashboard_items_found.visibility = View.GONE
 
-            rv_dashboard_items.layoutManager = LinearLayoutManager(requireActivity())
+            rv_dashboard_items.layoutManager = GridLayoutManager(activity, 2)
             rv_dashboard_items.setHasFixedSize(true)
 
-            val adapter = DashboardItemsListAdapter(requireActivity(),dashboardItemsList)
+            val adapter = DashboardItemsListAdapter(requireActivity(), dashboardItemsList)
             rv_dashboard_items.adapter = adapter
-        }
-        else{
+
+            adapter.setOnClickListener(object :
+                DashboardItemsListAdapter.OnClickListener {
+                override fun onClick(position: Int, product: Product) {
+
+                    val intent = Intent(context, ProductDetailsActivity::class.java)
+                    intent.putExtra(Constants.EXTRA_PRODUCT_ID, product.product_id)
+                    intent.putExtra(Constants.EXTRA_PRODUCT_OWNER_ID, product.user_id)
+                    startActivity(intent)
+                }
+            })
+            // END
+        } else {
             rv_dashboard_items.visibility = View.GONE
             tv_no_dashboard_items_found.visibility = View.VISIBLE
         }
-    }
-
-    private fun getDashBoardItemsList(){
-        showProgressDialog(getString(R.string.please_wait))
-        FirestoreClass().getDashBoardItemsList(this@DashboardFragment)
     }
 }

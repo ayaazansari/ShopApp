@@ -30,10 +30,9 @@
             android:scaleType="fitCenter"
             android:src="@drawable/tutorials_eu_logo"
             app:tint="@color/colorWhite" />
-
     </FrameLayout>
 
-    <com.myshoppal.utils.MSPTextBold
+    <com.myshoppal.utils.MSPTextViewBold
         android:id="@+id/tv_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -147,7 +146,7 @@
             android:textColor="@color/colorSecondaryText"
             android:textSize="@dimen/lbl_text_view_textSize" />
 
-        <com.myshoppal.utils.MSPTextBold
+        <com.myshoppal.utils.MSPTextViewBold
             android:id="@+id/tv_register"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -158,3 +157,4 @@
             android:textSize="@dimen/lbl_text_view_textSize" />
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
+    <!--END-->

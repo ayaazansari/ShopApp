@@ -8,7 +8,6 @@
     app:layout_constraintBottom_toBottomOf="parent"
     app:layout_constraintEnd_toEndOf="parent"
     app:layout_constraintStart_toStartOf="parent"
-    android:background="@color/colorWhite"
     tools:context=".ui.activities.SettingsActivity">
 
     <RelativeLayout
@@ -88,7 +87,7 @@
             android:textColor="@color/colorSecondaryText"
             android:textSize="@dimen/settings_edit_label_textSize" />
 
-        <com.myshoppal.utils.MSPTextBold
+        <com.myshoppal.utils.MSPTextViewBold
             android:id="@+id/tv_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -97,7 +96,7 @@
             android:layout_marginTop="@dimen/settings_name_marginTop"
             android:textColor="@color/colorDarkGrey"
             android:textSize="@dimen/settings_name_textSize"
-            tools:text="Ayaaz lld" />
+            tools:text="Denis Panjuta" />
 
         <com.myshoppal.utils.MSPTextView
             android:id="@+id/tv_gender"

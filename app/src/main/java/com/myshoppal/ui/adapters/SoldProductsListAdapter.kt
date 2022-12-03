@@ -1,23 +1,27 @@
 package com.myshoppal.ui.adapters
 
-import android.annotation.SuppressLint
 import android.content.Context
+import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.myshoppal.R
-import com.myshoppal.models.Product
+import com.myshoppal.models.SoldProduct
+import com.myshoppal.ui.activities.MyOrderDetailsActivity
+import com.myshoppal.ui.activities.SoldProductDetailsActivity
+import com.myshoppal.utils.Constants
 import com.myshoppal.utils.GlideLoader
-import kotlinx.android.synthetic.main.item_dashboard_layout.view.*
+import kotlinx.android.synthetic.main.item_list_layout.view.*
 
-open class DashboardItemsListAdapter(
+/**
+ * A adapter class for sold products list items.
+ */
+open class SoldProductsListAdapter(
     private val context: Context,
-    private var list: ArrayList<Product>
+    private var list: ArrayList<SoldProduct>
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
-    // A global variable for OnClickListener interface.
-    private var onClickListener: OnClickListener? = null
 
     /**
      * Inflates the item views which is designed in xml layout file
@@ -28,7 +32,7 @@ open class DashboardItemsListAdapter(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return MyViewHolder(
             LayoutInflater.from(context).inflate(
-                R.layout.item_dashboard_layout,
+                R.layout.item_list_layout,
                 parent,
                 false
             )
@@ -45,7 +49,6 @@ open class DashboardItemsListAdapter(
      * of the given type. You can either create a new View manually or inflate it from an XML
      * layout file.
      */
-    @SuppressLint("SetTextI18n")
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         val model = list[position]
 
@@ -53,15 +56,18 @@ open class DashboardItemsListAdapter(
 
             GlideLoader(context).loadProductPicture(
                 model.image,
-                holder.itemView.iv_dashboard_item_image
+                holder.itemView.iv_item_image
             )
-            holder.itemView.tv_dashboard_item_title.text = model.title
-            holder.itemView.tv_dashboard_item_price.text = "$${model.price}"
+
+            holder.itemView.tv_item_name.text = model.title
+            holder.itemView.tv_item_price.text = "$${model.price}"
+
+            holder.itemView.ib_delete_product.visibility = View.GONE
 
             holder.itemView.setOnClickListener {
-                if (onClickListener != null) {
-                    onClickListener!!.onClick(position, model)
-                }
+                val intent = Intent(context, SoldProductDetailsActivity::class.java)
+                intent.putExtra(Constants.EXTRA_SOLD_PRODUCT_DETAILS, model)
+                context.startActivity(intent)
             }
         }
     }
@@ -71,23 +77,6 @@ open class DashboardItemsListAdapter(
      */
     override fun getItemCount(): Int {
         return list.size
-    }
-
-    /**
-     * A function for OnClickListener where the Interface is the expected parameter and assigned to the global variable.
-     *
-     * @param onClickListener
-     */
-    fun setOnClickListener(onClickListener: OnClickListener) {
-        this.onClickListener = onClickListener
-    }
-
-    /**
-     * An interface for onclick items.
-     */
-    interface OnClickListener {
-
-        fun onClick(position: Int, product: Product)
     }
 
     /**

@@ -5,13 +5,28 @@ import android.graphics.Typeface
 import android.util.AttributeSet
 import androidx.appcompat.widget.AppCompatTextView
 
-class MSPTextView(context: Context, attrs: AttributeSet) :AppCompatTextView(context,attrs){
+/**
+ * This class will be used for Custom font text using the TextView which inherits the AppCompatTextView class.
+ */
+class MSPTextView(context: Context, attrs: AttributeSet) : AppCompatTextView(context, attrs) {
+
+    /**
+     * The init block runs every time the class is instantiated.
+     */
     init {
+        // Call the function to apply the font to the components.
         applyFont()
     }
 
-    private fun applyFont(){
-        val typeFace : Typeface = Typeface.createFromAsset(context.assets,"Montserrat-Regular.ttf")
-        typeface = typeFace
+    /**
+     * Applies a font to a TextView.
+     */
+    private fun applyFont() {
+
+        // This is used to get the file from the assets folder and set it to the title textView.
+        val typeface: Typeface =
+            Typeface.createFromAsset(context.assets, "Montserrat-Regular.ttf")
+        setTypeface(typeface)
+
     }
 }
